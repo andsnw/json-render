@@ -1,6 +1,6 @@
 # @json-render/react
 
-React renderer for @json-render/core - JSON becomes React components.
+**Predictable. Guardrailed. Fast.** React renderer for user-prompted dashboards, widgets, apps, and data visualizations.
 
 ## Features
 

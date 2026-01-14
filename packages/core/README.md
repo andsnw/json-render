@@ -1,6 +1,6 @@
 # @json-render/core
 
-Enterprise-grade JSON-driven UI library with conditional visibility, rich actions, and enhanced validation.
+**Predictable. Guardrailed. Fast.** Core library for safe, user-prompted UI generation.
 
 ## Features
 

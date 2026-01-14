@@ -9,11 +9,11 @@ export default function Home() {
     <>
       {/* Hero */}
       <section className="max-w-5xl mx-auto px-6 pt-24 pb-16 text-center">
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tighter mb-6">
-          JSON becomes UI
+        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tighter mb-6">
+          Predictable. Guardrailed. Fast.
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
-          Define a catalog. AI generates JSON. Your components render natively.
+          Let users generate dashboards, widgets, apps, and data visualizations from prompts — safely constrained to components you define.
         </p>
 
         <Demo />
@@ -52,23 +52,23 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-12">
             <div>
               <div className="text-xs text-muted-foreground font-mono mb-3">01</div>
-              <h3 className="text-lg font-semibold mb-2">Define Catalog</h3>
+              <h3 className="text-lg font-semibold mb-2">Define Your Catalog</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Specify which components AI can use with Zod schemas. Full type safety and validation.
+                Set the guardrails. Define which components, actions, and data bindings AI can use.
               </p>
             </div>
             <div>
               <div className="text-xs text-muted-foreground font-mono mb-3">02</div>
-              <h3 className="text-lg font-semibold mb-2">Register Components</h3>
+              <h3 className="text-lg font-semibold mb-2">Users Prompt</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Map catalog types to your React components. Use your own design system.
+                End users describe what they want. AI generates JSON constrained to your catalog.
               </p>
             </div>
             <div>
               <div className="text-xs text-muted-foreground font-mono mb-3">03</div>
-              <h3 className="text-lg font-semibold mb-2">Let AI Generate</h3>
+              <h3 className="text-lg font-semibold mb-2">Render Instantly</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                AI outputs JSON matching your schema. Stream it. Render progressively.
+                Stream the response. Your components render progressively as JSON arrives.
               </p>
             </div>
           </div>

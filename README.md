@@ -1,6 +1,8 @@
 # json-render
 
-**JSON becomes real things.** Define your catalog, register your components, let AI generate.
+**Predictable. Guardrailed. Fast.**
+
+Let end users generate dashboards, widgets, apps, and data visualizations from prompts — safely constrained to components you define.
 
 ```bash
 npm install @json-render/core @json-render/react
@@ -8,11 +10,11 @@ npm install @json-render/core @json-render/react
 
 ## Why json-render?
 
-Unlike vibe-coding tools that generate arbitrary code, json-render gives AI a **constrained vocabulary**. Perfect for enterprise apps where you need:
+When users prompt for UI, you need guarantees. json-render gives AI a **constrained vocabulary** so output is always predictable:
 
-- **Consistency** — AI only uses your approved components
-- **Safety** — Actions are declared by name, you control what they do
-- **Flexibility** — Works for UI, backend, anything
+- **Guardrailed** — AI can only use components in your catalog
+- **Predictable** — JSON output matches your schema, every time
+- **Fast** — Stream and render progressively as the model responds
 
 ## Quick Start
 
@@ -208,20 +210,20 @@ json-render/
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│   Prompt    │────▶│  AI + Catalog│────▶│  JSON Tree  │
-│ "dashboard" │     │  (constrained)    │  (safe)     │
+│ User Prompt │────▶│  AI + Catalog│────▶│  JSON Tree  │
+│ "dashboard" │     │ (guardrailed)│     │(predictable)│
 └─────────────┘     └──────────────┘     └─────────────┘
                                                │
                     ┌──────────────┐            │
                     │  Your React  │◀───────────┘
-                    │  Components  │
+                    │  Components  │ (streamed)
                     └──────────────┘
 ```
 
-1. **You define the catalog** — what components exist, what props they take
-2. **AI generates JSON** — constrained to your catalog
-3. **You render it** — with your own components
-4. **Actions are safe** — AI declares intent (`"refund"`), you implement it
+1. **Define the guardrails** — what components, actions, and data bindings AI can use
+2. **Users prompt** — end users describe what they want in natural language
+3. **AI generates JSON** — output is always predictable, constrained to your catalog
+4. **Render fast** — stream and render progressively as the model responds
 
 ## License
 
