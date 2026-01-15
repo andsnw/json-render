@@ -6,6 +6,10 @@ Instructions for AI coding agents working with this codebase.
 
 - Do not use emojis in code or UI
 
+## Workflow
+
+- Run `pnpm type-check` after each turn to ensure type safety
+
 <!-- opensrc:start -->
 
 ## Source Code Reference
