@@ -116,13 +116,10 @@ const customPrompt = catalog.prompt({
       <h2 className="text-xl font-semibold mt-12 mb-4">Next</h2>
       <p className="text-sm text-muted-foreground">
         Learn how to{" "}
-        <Link
-          href="/docs/components"
-          className="text-foreground hover:underline"
-        >
-          register React components
+        <Link href="/docs/registry" className="text-foreground hover:underline">
+          register components
         </Link>{" "}
-        for your catalog.
+        in your registry.
       </p>
     </article>
   );

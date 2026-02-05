@@ -24,7 +24,7 @@ const navigation = [
     title: "Core Concepts",
     items: [
       { title: "Catalog", href: "/docs/catalog" },
-      { title: "Components", href: "/docs/components" },
+      { title: "Registry", href: "/docs/registry" },
       { title: "Data Binding", href: "/docs/data-binding" },
       { title: "Actions", href: "/docs/actions" },
       { title: "Visibility", href: "/docs/visibility" },
