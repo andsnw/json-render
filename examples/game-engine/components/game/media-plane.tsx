@@ -81,7 +81,8 @@ export function MediaPlane({
       <planeGeometry args={[w, h]} />
       {texture ? (
         <meshBasicMaterial
-          map={texture as THREE.Texture}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @types/three version mismatch
+          map={texture as any}
           side={THREE.DoubleSide}
         />
       ) : (

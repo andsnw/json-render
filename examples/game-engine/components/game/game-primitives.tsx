@@ -590,7 +590,8 @@ export function GameExtrude({
       >
         <extrudeGeometry
           args={[
-            shape as THREE.Shape,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @types/three version mismatch
+            shape as any,
             { depth: depth ?? 1, bevelEnabled: false },
           ]}
         />
@@ -642,7 +643,8 @@ export function GameTube({
       >
         <tubeGeometry
           args={[
-            curve as THREE.Curve<THREE.Vector3>,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @types/three version mismatch
+            curve as any,
             tubularSegments ?? 64,
             radius ?? 0.1,
             radialSegments ?? 8,
@@ -714,7 +716,8 @@ export function GameShape({
         castShadow={castShadow ?? false}
         receiveShadow={receiveShadow ?? false}
       >
-        <shapeGeometry args={[shape as THREE.Shape]} />
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any -- @types/three version mismatch */}
+        <shapeGeometry args={[shape as any]} />
         <meshStandardMaterial
           {...buildMaterialProps(material)}
           side={THREE.DoubleSide}
