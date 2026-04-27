@@ -5,9 +5,243 @@ export const metadata = pageMetadata("docs/changelog")
 
 Notable changes and updates to json-render.
 
+## v0.18.0
+
+April 17, 2026
+
+### New: Devtools
+
+Five new packages for inspecting json-render apps in the browser:
+
+- `@json-render/devtools` -- framework-agnostic core
+- `@json-render/devtools-react`
+- `@json-render/devtools-vue`
+- `@json-render/devtools-svelte`
+- `@json-render/devtools-solid`
+
+Drop `<JsonRenderDevtools />` into your app to get a shadow-DOM-isolated panel with six tabs (Spec, State, Actions, Stream, Catalog, Pick), a DOM picker that maps clicked elements back to spec keys via `data-jr-key`, and a capped event store. Toggle with the floating button or `Cmd`/`Ctrl` + `Shift` + `J`. Tree-shakes to `null` in production.
+
+```bash
+npm install @json-render/devtools-react
+```
+
+```tsx
+import { JsonRenderDevtools } from "@json-render/devtools-react";
+
+<JsonRenderDevtools />
+```
+
+See the [Devtools guide](/docs/devtools) and the [API reference](/docs/api/devtools) for details.
+
+### New: Devtools Example
+
+New `examples/devtools` Next.js demo showing the full devtools panel wired up to an AI chat endpoint and a component catalog.
+
+### New: Action Observer and Devtools Flag in Core
+
+`@json-render/core` now exposes an action observer and a devtools enablement flag that framework adapters use to mirror actions and stream events into the panel.
+
+### Fixed: Zod 4 Schema Formatting
+
+`formatZodType` now correctly handles `z.record()`, `z.default()`, and `z.literal()` types from Zod 4, which previously produced incorrect or empty output in generated prompts and schemas.
+
+---
+
+## v0.17.0
+
+April 10, 2026
+
+### New: Gaussian Splatting
+
+Added `GaussianSplat` component to `@json-render/react-three-fiber`, bringing the component count to 20. Composable with all existing R3F components (lights, controls, post-processing) via drei's Splat loader.
+
+### New: R3F Gaussian Splatting Example
+
+Demo app with five scenes: splat showroom, splat with primitives, multi-splat, post-processing effects, and animated floating splat.
+
+### New: Standalone gsplat Example
+
+Experimental demo app showcasing Gaussian Splatting with gsplat.js (no Three.js dependency), featuring scene selector, live JSON spec viewer, and progress indicator.
+
+### Improved: AI Output Quality
+
+Improved prompt output and schema generation for more reliable AI-generated specs.
+
+---
+
+## v0.16.0
+
+March 27, 2026
+
+### New: `@json-render/next`
+
+Next.js renderer that turns JSON specs into full Next.js applications with routes, layouts, SSR, metadata, data loaders, and static generation. Client and server entry points at `@json-render/next` and `@json-render/next/server`. Includes built-in `Link`, `Slot`, error boundary, loading, and not-found components.
+
+```bash
+npm install @json-render/next
+```
+
+### New: `@json-render/shadcn-svelte`
+
+Pre-built shadcn-svelte components for json-render Svelte apps. 36 components built on Svelte 5 + Tailwind CSS with state binding, validation, and action support. Server-safe catalog at `@json-render/shadcn-svelte/catalog`.
+
+```bash
+npm install @json-render/shadcn-svelte
+```
+
+### Improved: Release Process
+
+Switched from Changesets to a manual single-PR release workflow with changelog markers and automatic npm publish on version bump.
+
+---
+
+## v0.15.0
+
+March 23, 2026
+
+### New: `@json-render/ink`
+
+Terminal renderer for json-render. JSON becomes terminal UIs powered by [Ink](https://github.com/vadimdemedes/ink). Stream AI-generated specs directly to the terminal with `useUIStream`.
+
+```bash
+npm install @json-render/ink
+```
+
+### Improved: YAML Format Support in `buildUserPrompt`
+
+`buildUserPrompt` now accepts `format` and `serializer` options, enabling YAML as a wire format alongside JSON.
+
+---
+
+## v0.14.0
+
+March 13, 2026
+
+### New: `@json-render/yaml`
+
+YAML wire format for json-render. Includes streaming YAML parser, `yamlPrompt()` for system prompts, and AI SDK transform (`pipeYamlRender`) as a drop-in alternative to JSONL streaming. Supports four fence types: `yaml-spec`, `yaml-edit`, `yaml-patch`, and `diff`.
+
+```bash
+npm install @json-render/yaml
+```
+
+### New: Universal Edit Modes
+
+Three strategies for multi-turn spec refinement in `@json-render/core`:
+
+- **Patch** -- RFC 6902 JSON Patch
+- **Merge** -- RFC 7396 Merge Patch
+- **Diff** -- Unified diff
+
+New `editModes` option on `buildUserPrompt()` and `PromptOptions`. New helpers: `deepMergeSpec()`, `diffToPatches()`, `buildEditUserPrompt()`, `buildEditInstructions()`, `isNonEmptySpec()`.
+
+### Improved: Playground
+
+Format toggle (JSONL / YAML), edit mode picker (patch / merge / diff), and token usage display with prompt caching stats.
+
+### Improved: Prompt Caching
+
+Generate API uses Anthropic ephemeral cache control for system prompts.
+
+---
+
+## v0.13.0
+
+March 12, 2026
+
+### New: `@json-render/solid`
+
+SolidJS renderer for json-render. JSON becomes Solid components with reactive rendering, schema export, and full catalog support.
+
+```bash
+npm install @json-render/core @json-render/solid
+```
+
+### New: `@json-render/react-three-fiber`
+
+React Three Fiber renderer for json-render. JSON becomes 3D scenes with 19 built-in components for meshes, lights, models, environments, text, cameras, and controls.
+
+```bash
+npm install @json-render/react-three-fiber
+```
+
+### Improved: Strict JSON Schema Mode
+
+`catalog.jsonSchema({ strict: true })` produces a JSON Schema subset compatible with LLM structured output APIs (OpenAI, Google Gemini, Anthropic). Ensures `additionalProperties: false` on every object and all properties listed in `required`.
+
+---
+
+## v0.12.1
+
+March 11, 2026
+
+### Changed: Generation Mode Renames
+
+Renamed generation modes from `"generate"` / `"chat"` to `"standalone"` / `"inline"`. The old names still work but emit a deprecation warning.
+
+### Fixed: MCP React Duplicate Module Error
+
+Resolved React duplicate module error (`useRef` returning null) in `@json-render/mcp` by adding `resolve.dedupe` Vite configuration. Added `./build-app-html` export entry point.
+
+---
+
+## v0.12.0
+
+March 6, 2026
+
+### New: `@json-render/svelte`
+
+Svelte 5 renderer with runes-based reactivity. Full support for data binding, visibility, actions, validation, watchers, streaming, and repeat scopes. Includes `defineRegistry`, `Renderer`, `schema`, composables, and context providers.
+
+```bash
+npm install @json-render/core @json-render/svelte
+```
+
+### New: `@json-render/react-email`
+
+React Email renderer for generating HTML and plain-text emails from JSON specs. 17 standard components (Html, Head, Body, Container, Section, Row, Column, Heading, Text, Link, Button, Image, Hr, Preview, Markdown). Server-side `renderToHtml` / `renderToPlainText` APIs.
+
+```bash
+npm install @json-render/react-email
+```
+
+### New: `@json-render/mcp`
+
+MCP Apps integration that serves json-render UIs as interactive apps inside Claude, ChatGPT, Cursor, VS Code, and other MCP-capable clients. `createMcpApp` server factory, `useJsonRenderApp` React hook for iframes, and `buildAppHtml` utility.
+
+```bash
+npm install @json-render/mcp
+```
+
+---
+
+## v0.11.0
+
+February 27, 2026
+
+### New: `@json-render/image`
+
+Server-side image renderer powered by Satori. Turns the same `{ root, elements }` spec format into SVG or PNG output for OG images, social cards, and banners.
+
+```bash
+npm install @json-render/image
+```
+
+```typescript
+import { renderToSvg, renderToPng } from "@json-render/image/render";
+import { standardComponentDefinitions } from "@json-render/image/catalog";
+
+const svg = await renderToSvg(spec, { width: 1200, height: 630 });
+const png = await renderToPng(spec, { width: 1200, height: 630 });
+```
+
+9 standard components: Frame, Box, Row, Column, Heading, Text, Image, Divider, Spacer. Server-safe import path at `@json-render/image/server`.
+
+---
+
 ## v0.10.0
 
-February 2026
+February 25, 2026
 
 ### New: `@json-render/vue`
 
@@ -120,7 +354,7 @@ All form components now support `checks` and `validateOn` props:
 
 ## v0.9.1
 
-February 2026
+February 24, 2026
 
 ### Fixed: Install failure due to private dependency
 
@@ -130,7 +364,7 @@ February 2026
 
 ## v0.9.0
 
-February 2026
+February 24, 2026
 
 ### New: External State Store
 
@@ -184,7 +418,7 @@ Fixed safely resolving the inner type for Zod arrays in schema introspection, pr
 
 ## v0.8.0
 
-February 2026
+February 20, 2026
 
 ### New: `@json-render/react-pdf`
 
@@ -246,7 +480,7 @@ Supports custom catalogs with `defineRegistry`, server-safe imports via `@json-r
 
 ## v0.7.0
 
-February 2026
+February 17, 2026
 
 ### New: `@json-render/shadcn`
 
@@ -337,7 +571,7 @@ Action bindings now support a `preventDefault` boolean field, allowing the LLM t
 
 ## v0.6.0
 
-February 2026
+February 13, 2026
 
 ### New: Chat Mode (Inline GenUI)
 
@@ -479,7 +713,7 @@ See the [Migration Guide](/docs/migration) for detailed upgrade instructions.
 
 ## v0.5.0
 
-February 2026
+February 9, 2026
 
 ### New: @json-render/react-native
 
@@ -598,7 +832,7 @@ Schema prompts now include streaming best practices, repeat/list examples, and s
 
 ## v0.4.0
 
-February 2026
+February 5, 2026
 
 ### New: Custom Schema System
 
@@ -733,7 +967,7 @@ The dashboard example is now a full-featured accounting dashboard with:
 
 ## v0.3.0
 
-January 2026
+January 20, 2026
 
 Internal release with codegen foundations.
 
@@ -747,7 +981,7 @@ Internal release with codegen foundations.
 
 ## v0.2.0
 
-January 2026
+January 14, 2026
 
 Initial public release.
 
