@@ -1,8 +1,24 @@
 # Changelog
 
-## 0.18.0
+## 0.19.0
 
 <!-- release:start -->
+### New Features
+
+- **Custom directives API** — `@json-render/core` now supports custom directives via `defineDirective`, letting you declare new JSON shapes (like `$format`, `$math`) that resolve to computed values at render time. Directives compose naturally — nest `$format` over `$math` over `$state` and they resolve inside-out. All four renderers (React, Vue, Svelte, Solid) have built-in directive resolution (#279)
+- **`@json-render/directives`** — New package shipping seven ready-made directives: `$format` (date, currency, number, percent via `Intl`), `$math` (add, subtract, multiply, divide, mod, min, max, round, floor, ceil, abs), `$concat`, `$count`, `$truncate`, `$pluralize`, and `$join`. Also exports `createI18nDirective` for `$t` translation keys with `{{param}}` interpolation, and `standardDirectives` for one-line registration (#279)
+
+### Improvements
+
+- **Example READMEs** — Added documentation to the chat, dashboard, game-engine, and no-ai examples (#277)
+
+### Contributors
+
+- @ctate
+<!-- release:end -->
+
+## 0.18.0
+
 ### New Features
 
 - **Devtools** — Five new packages for inspecting json-render apps in the browser: `@json-render/devtools` (framework-agnostic core), plus `@json-render/devtools-react`, `@json-render/devtools-vue`, `@json-render/devtools-svelte`, and `@json-render/devtools-solid` adapters. Drop `<JsonRenderDevtools />` into your app to get a shadow-DOM-isolated panel with six tabs (Spec, State, Actions, Stream, Catalog, Pick), a DOM picker that maps clicked elements back to spec keys via `data-jr-key`, a capped event store, and server-side stream tap utilities. Floating toggle or `Cmd`/`Ctrl` + `Shift` + `J`, tree-shakes to `null` in production (#273)
@@ -21,7 +37,6 @@
 
 - @ctate
 - @mvanhorn
-<!-- release:end -->
 
 ## 0.17.0
 

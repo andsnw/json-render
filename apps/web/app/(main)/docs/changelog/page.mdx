@@ -5,6 +5,35 @@ export const metadata = pageMetadata("docs/changelog")
 
 Notable changes and updates to json-render.
 
+## v0.19.0
+
+May 6, 2026
+
+### New: Custom Directives API
+
+`@json-render/core` now supports custom directives via `defineDirective`, letting you declare new JSON shapes (like `$format`, `$math`) that resolve to computed values at render time. Directives compose naturally -- nest `$format` over `$math` over `$state` and they resolve inside-out. All four renderers (React, Vue, Svelte, Solid) have built-in directive resolution.
+
+### New: `@json-render/directives`
+
+New package shipping seven ready-made directives: `$format` (date, currency, number, percent via `Intl`), `$math` (arithmetic and rounding), `$concat`, `$count`, `$truncate`, `$pluralize`, and `$join`. Also exports `createI18nDirective` for `$t` translation keys with interpolation, and `standardDirectives` for one-line registration.
+
+```bash
+npm install @json-render/directives
+```
+
+```tsx
+import { standardDirectives } from "@json-render/directives";
+
+const catalog = createCatalog({
+  directives: standardDirectives,
+  // ...
+});
+```
+
+See the [Directives guide](/docs/directives) and the [API reference](/docs/api/directives) for details.
+
+---
+
 ## v0.18.0
 
 April 17, 2026
