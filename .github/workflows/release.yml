@@ -87,7 +87,34 @@ jobs:
         run: pnpm run build
 
       - name: Publish all public packages
-        run: pnpm -r publish --provenance --no-git-checks --access public --filter '@json-render/*'
+        run: |
+          LOCAL_VERSION="${{ needs.check-release.outputs.version }}"
+          FAILED=""
+
+          publish_pkg() {
+            local dir="$1" name="$2"
+            REGISTRY_VERSION=$(npm view "$name" version 2>/dev/null || echo "0.0.0")
+            if [ "$LOCAL_VERSION" = "$REGISTRY_VERSION" ]; then
+              echo "$name@$LOCAL_VERSION already published, skipping"
+              return 0
+            fi
+            echo "Publishing $name@$LOCAL_VERSION..."
+            TARBALL=$(cd "$dir" && pnpm pack --pack-destination /tmp | tail -1)
+            if ! npm publish "$TARBALL" --provenance --access public; then
+              FAILED="$FAILED $name"
+            fi
+          }
+
+          for dir in packages/*/; do
+            PKG_NAME=$(node -p "try { const p = require('./$dir/package.json'); p.private ? '' : p.name } catch { '' }")
+            [ -z "$PKG_NAME" ] && continue
+            publish_pkg "$dir" "$PKG_NAME"
+          done
+
+          if [ -n "$FAILED" ]; then
+            echo "Failed to publish:$FAILED"
+            exit 1
+          fi
 
   github-release:
     name: Create GitHub Release
