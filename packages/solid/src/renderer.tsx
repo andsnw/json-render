@@ -19,6 +19,8 @@ import type {
   SchemaDefinition,
   StateStore,
   ComputedFunction,
+  DirectiveDefinition,
+  DirectiveRegistry,
 } from "@json-render/core";
 import {
   resolveElementProps,
@@ -28,6 +30,7 @@ import {
   getByPath,
   isDevtoolsActive,
   subscribeDevtoolsActive,
+  createDirectiveRegistry,
   type PropResolutionContext,
   type VisibilityContext as CoreVisibilityContext,
 } from "@json-render/core";
@@ -111,6 +114,18 @@ function useFunctions(): Record<string, ComputedFunction> {
   return useContext(FunctionsContext) ?? EMPTY_FUNCTIONS;
 }
 
+// ---------------------------------------------------------------------------
+// DirectivesContext – provides custom directive registry to the element tree
+// ---------------------------------------------------------------------------
+
+const DirectivesContext = createContext<DirectiveRegistry | undefined>(
+  undefined,
+);
+
+function useDirectives(): DirectiveRegistry | undefined {
+  return useContext(DirectivesContext);
+}
+
 interface ElementRendererProps {
   element: UIElement;
   /** Spec key for this element. Used by the devtools picker. */
@@ -142,8 +157,9 @@ function ElementRenderer(props: ElementRendererProps) {
   const stateStore = useStateStore();
   const getSnapshot = () => stateStore.getSnapshot();
   const functions = useFunctions();
+  const directives = useDirectives();
 
-  // Build context with repeat scope and $computed functions
+  // Build context with repeat scope, $computed functions, and custom directives
   const fullCtx = createMemo<PropResolutionContext>(() => {
     const repeatItem = repeatScope?.item;
     const repeatIndex = repeatScope?.index;
@@ -157,6 +173,7 @@ function ElementRenderer(props: ElementRendererProps) {
       ...(repeatIndex !== undefined ? { repeatIndex } : {}),
       ...(repeatBasePath !== undefined ? { repeatBasePath } : {}),
       functions,
+      directives,
     };
   });
 
@@ -519,6 +536,8 @@ export interface JSONUIProviderProps {
   >;
   /** Named functions for `$computed` expressions in props */
   functions?: Record<string, ComputedFunction>;
+  /** Custom directives for user-defined `$`-prefixed dynamic values */
+  directives?: DirectiveDefinition[];
   /** Callback when state changes (uncontrolled mode) */
   onStateChange?: (changes: Array<{ path: string; value: unknown }>) => void;
   children: JSX.Element;
@@ -528,6 +547,9 @@ export interface JSONUIProviderProps {
  * Combined provider for all JSONUI contexts
  */
 export function JSONUIProvider(props: JSONUIProviderProps) {
+  const directiveRegistry = createMemo(() =>
+    props.directives ? createDirectiveRegistry(props.directives) : undefined,
+  );
   return (
     <StateProvider
       store={props.store}
@@ -540,8 +562,10 @@ export function JSONUIProvider(props: JSONUIProviderProps) {
             <FunctionsContext.Provider
               value={props.functions ?? EMPTY_FUNCTIONS}
             >
-              {props.children}
-              <ConfirmationDialogManager />
+              <DirectivesContext.Provider value={directiveRegistry()}>
+                {props.children}
+                <ConfirmationDialogManager />
+              </DirectivesContext.Provider>
             </FunctionsContext.Provider>
           </ActionProvider>
         </ValidationProvider>
@@ -748,6 +772,8 @@ export interface CreateRendererProps {
   onStateChange?: (changes: Array<{ path: string; value: unknown }>) => void;
   /** Named functions for `$computed` expressions in props */
   functions?: Record<string, ComputedFunction>;
+  /** Custom directives for user-defined `$`-prefixed dynamic values */
+  directives?: DirectiveDefinition[];
   /** Whether the spec is currently loading/streaming */
   loading?: boolean;
   /** Fallback component for unknown types */
@@ -796,6 +822,10 @@ export function createRenderer<
 
   // Return the renderer component
   return function CatalogRenderer(props: CreateRendererProps) {
+    const directiveRegistry = createMemo(() =>
+      props.directives ? createDirectiveRegistry(props.directives) : undefined,
+    );
+
     // Wrap onAction with a Proxy so any action name routes to the callback
     const actionHandlers = () =>
       props.onAction
@@ -826,13 +856,15 @@ export function createRenderer<
               <FunctionsContext.Provider
                 value={props.functions ?? EMPTY_FUNCTIONS}
               >
-                <Renderer
-                  spec={props.spec}
-                  registry={registry}
-                  loading={props.loading}
-                  fallback={props.fallback}
-                />
-                <ConfirmationDialogManager />
+                <DirectivesContext.Provider value={directiveRegistry()}>
+                  <Renderer
+                    spec={props.spec}
+                    registry={registry}
+                    loading={props.loading}
+                    fallback={props.fallback}
+                  />
+                  <ConfirmationDialogManager />
+                </DirectivesContext.Provider>
               </FunctionsContext.Provider>
             </ActionProvider>
           </ValidationProvider>

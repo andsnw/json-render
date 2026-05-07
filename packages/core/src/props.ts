@@ -1,6 +1,7 @@
 import type { VisibilityCondition, StateModel } from "./types";
 import { getByPath } from "./types";
 import { evaluateVisibility, type VisibilityContext } from "./visibility";
+import { findDirective, type DirectiveRegistry } from "./directives";
 
 // =============================================================================
 // Prop Expression Types
@@ -61,6 +62,8 @@ export interface PropResolutionContext extends VisibilityContext {
   repeatBasePath?: string;
   /** Named functions available for `$computed` expressions. */
   functions?: Record<string, ComputedFunction>;
+  /** Custom directive registry for user-defined `$`-prefixed dynamic values. */
+  directives?: DirectiveRegistry;
 }
 
 // =============================================================================
@@ -291,8 +294,17 @@ export function resolvePropValue(
     return value.map((item) => resolvePropValue(item, ctx));
   }
 
-  // Plain objects (not expressions): resolve each value recursively
+  // Custom directives: check registry before generic object recursion
   if (typeof value === "object") {
+    const directive = findDirective(
+      value as Record<string, unknown>,
+      ctx.directives,
+    );
+    if (directive) {
+      return directive.resolve(value, ctx);
+    }
+
+    // Plain objects (not expressions): resolve each value recursively
     const resolved: Record<string, unknown> = {};
     for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
       resolved[key] = resolvePropValue(val, ctx);

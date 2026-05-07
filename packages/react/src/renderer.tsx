@@ -17,6 +17,8 @@ import type {
   SchemaDefinition,
   StateStore,
   ComputedFunction,
+  DirectiveDefinition,
+  DirectiveRegistry,
 } from "@json-render/core";
 import {
   resolveElementProps,
@@ -26,6 +28,7 @@ import {
   getByPath,
   isDevtoolsActive,
   subscribeDevtoolsActive,
+  createDirectiveRegistry,
   type PropResolutionContext,
   type VisibilityContext as CoreVisibilityContext,
 } from "@json-render/core";
@@ -154,6 +157,18 @@ function useFunctions(): Record<string, ComputedFunction> {
   return React.useContext(FunctionsContext);
 }
 
+// ---------------------------------------------------------------------------
+// DirectivesContext – provides custom directive registry to the element tree
+// ---------------------------------------------------------------------------
+
+const DirectivesContext = React.createContext<DirectiveRegistry | undefined>(
+  undefined,
+);
+
+function useDirectives(): DirectiveRegistry | undefined {
+  return React.useContext(DirectivesContext);
+}
+
 interface ElementRendererProps {
   element: UIElement;
   /** Spec key for this element. Used by the devtools picker. */
@@ -194,8 +209,9 @@ const ElementRenderer = React.memo(function ElementRenderer({
   const { execute } = useActions();
   const { getSnapshot, state: watchState } = useStateStore();
   const functions = useFunctions();
+  const directives = useDirectives();
 
-  // Build context with repeat scope and $computed functions
+  // Build context with repeat scope, $computed functions, and custom directives
   const fullCtx: PropResolutionContext = useMemo(() => {
     const base: PropResolutionContext = repeatScope
       ? {
@@ -206,8 +222,9 @@ const ElementRenderer = React.memo(function ElementRenderer({
         }
       : { ...ctx };
     base.functions = functions;
+    base.directives = directives;
     return base;
-  }, [ctx, repeatScope, functions]);
+  }, [ctx, repeatScope, functions, directives]);
 
   // Evaluate visibility (now supports $item/$index inside repeat scopes)
   const isVisible =
@@ -554,6 +571,8 @@ export interface JSONUIProviderProps {
   >;
   /** Named functions for `$computed` expressions in props */
   functions?: Record<string, ComputedFunction>;
+  /** Custom directives for user-defined `$`-prefixed dynamic values */
+  directives?: DirectiveDefinition[];
   /** Callback when state changes (uncontrolled mode) */
   onStateChange?: (changes: Array<{ path: string; value: unknown }>) => void;
   children: ReactNode;
@@ -570,9 +589,14 @@ export function JSONUIProvider({
   navigate,
   validationFunctions,
   functions,
+  directives,
   onStateChange,
   children,
 }: JSONUIProviderProps) {
+  const directiveRegistry = useMemo(
+    () => (directives ? createDirectiveRegistry(directives) : undefined),
+    [directives],
+  );
   return (
     <StateProvider
       store={store}
@@ -583,8 +607,10 @@ export function JSONUIProvider({
         <ValidationProvider customFunctions={validationFunctions}>
           <ActionProvider handlers={handlers} navigate={navigate}>
             <FunctionsContext.Provider value={functions ?? EMPTY_FUNCTIONS}>
-              {children}
-              <ConfirmationDialogManager />
+              <DirectivesContext.Provider value={directiveRegistry}>
+                {children}
+                <ConfirmationDialogManager />
+              </DirectivesContext.Provider>
             </FunctionsContext.Provider>
           </ActionProvider>
         </ValidationProvider>
@@ -790,6 +816,8 @@ export interface CreateRendererProps {
   onStateChange?: (changes: Array<{ path: string; value: unknown }>) => void;
   /** Named functions for `$computed` expressions in props */
   functions?: Record<string, ComputedFunction>;
+  /** Custom directives for user-defined `$`-prefixed dynamic values */
+  directives?: DirectiveDefinition[];
   /** Whether the spec is currently loading/streaming */
   loading?: boolean;
   /** Fallback component for unknown types */
@@ -844,9 +872,15 @@ export function createRenderer<
     onAction,
     onStateChange,
     functions,
+    directives,
     loading,
     fallback,
   }: CreateRendererProps) {
+    const directiveRegistry = useMemo(
+      () => (directives ? createDirectiveRegistry(directives) : undefined),
+      [directives],
+    );
+
     // Wrap onAction with a Proxy so any action name routes to the callback
     const actionHandlers = onAction
       ? new Proxy(
@@ -874,13 +908,15 @@ export function createRenderer<
           <ValidationProvider>
             <ActionProvider handlers={actionHandlers}>
               <FunctionsContext.Provider value={functions ?? EMPTY_FUNCTIONS}>
-                <Renderer
-                  spec={spec}
-                  registry={registry}
-                  loading={loading}
-                  fallback={fallback}
-                />
-                <ConfirmationDialogManager />
+                <DirectivesContext.Provider value={directiveRegistry}>
+                  <Renderer
+                    spec={spec}
+                    registry={registry}
+                    loading={loading}
+                    fallback={fallback}
+                  />
+                  <ConfirmationDialogManager />
+                </DirectivesContext.Provider>
               </FunctionsContext.Provider>
             </ActionProvider>
           </ValidationProvider>

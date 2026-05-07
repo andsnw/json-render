@@ -1,6 +1,7 @@
 import type {
   Catalog,
   ComputedFunction,
+  DirectiveDefinition,
   SchemaDefinition,
   Spec,
   StateStore,
@@ -206,6 +207,8 @@ export interface CreateRendererProps {
   onStateChange?: (changes: Array<{ path: string; value: unknown }>) => void;
   /** Named functions for `$computed` expressions in props */
   functions?: Record<string, ComputedFunction>;
+  /** Custom directives for user-defined `$`-prefixed dynamic values */
+  directives?: DirectiveDefinition[];
   loading?: boolean;
   fallback?: Component;
 }
@@ -263,6 +266,9 @@ export function createRenderer<
       },
       get functions() {
         return props.functions;
+      },
+      get directives() {
+        return props.directives;
       },
       get loading() {
         return props.loading;

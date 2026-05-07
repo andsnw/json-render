@@ -1,23 +1,20 @@
 {
-  "name": "@json-render/react",
+  "name": "@json-render/directives",
   "version": "0.18.0",
   "license": "Apache-2.0",
-  "description": "React renderer for @json-render/core. JSON becomes React components.",
+  "description": "Pre-built directives for @json-render/core — $format, $math, $concat, $count, $truncate, $pluralize, $join, and $t (i18n).",
   "keywords": [
-    "json",
-    "ui",
-    "react",
-    "ai",
-    "generative-ui",
-    "llm",
-    "renderer",
-    "streaming",
-    "components"
+    "json-render",
+    "directives",
+    "format",
+    "i18n",
+    "math",
+    "generative-ui"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vercel-labs/json-render.git",
-    "directory": "packages/react"
+    "directory": "packages/directives"
   },
   "homepage": "https://json-render.dev",
   "bugs": {
@@ -34,11 +31,6 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    },
-    "./schema": {
-      "types": "./dist/schema.d.ts",
-      "import": "./dist/schema.mjs",
-      "require": "./dist/schema.js"
     }
   },
   "files": [
@@ -47,20 +39,20 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@json-render/core": "workspace:*"
   },
   "devDependencies": {
-    "@internal/react-state": "workspace:*",
     "@internal/typescript-config": "workspace:*",
-    "@types/react": "19.2.3",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5",
+    "vitest": "^4.0.17",
     "zod": "^4.3.6"
   },
   "peerDependencies": {
-    "react": "^19.2.3"
+    "zod": "^4.0.0"
   }
 }

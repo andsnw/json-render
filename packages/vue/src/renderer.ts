@@ -21,6 +21,8 @@ import type {
   ComputedFunction,
   SchemaDefinition,
   StateStore,
+  DirectiveDefinition,
+  DirectiveRegistry,
 } from "@json-render/core";
 import {
   resolveElementProps,
@@ -28,6 +30,7 @@ import {
   resolveActionParam,
   evaluateVisibility,
   getByPath,
+  createDirectiveRegistry,
   isDevtoolsActive,
   subscribeDevtoolsActive,
   type PropResolutionContext,
@@ -114,6 +117,36 @@ function useFunctions(): ComputedRef<Record<string, ComputedFunction>> {
   return inject<ComputedRef<Record<string, ComputedFunction>>>(
     FUNCTIONS_KEY,
     computed(() => EMPTY_FUNCTIONS),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// DirectivesContext — provides custom directive registry to the element tree
+// ---------------------------------------------------------------------------
+
+const DIRECTIVES_KEY = Symbol("json-render:directives");
+
+const DirectivesProvider = defineComponent({
+  name: "DirectivesProvider",
+  props: {
+    directives: {
+      type: Array as PropType<DirectiveDefinition[]>,
+      default: undefined,
+    },
+  },
+  setup(props, { slots }) {
+    const registry = computed(() =>
+      props.directives ? createDirectiveRegistry(props.directives) : undefined,
+    );
+    provide(DIRECTIVES_KEY, registry);
+    return () => slots.default?.();
+  },
+});
+
+function useDirectives(): ComputedRef<DirectiveRegistry | undefined> {
+  return inject<ComputedRef<DirectiveRegistry | undefined>>(
+    DIRECTIVES_KEY,
+    computed(() => undefined),
   );
 }
 
@@ -239,8 +272,9 @@ const ElementRenderer = defineComponent({
     const { execute } = useActions();
     const { getSnapshot, state: watchState } = useStateStore();
     const functions = useFunctions();
+    const directives = useDirectives();
 
-    // Build context with repeat scope and $computed functions
+    // Build context with repeat scope, $computed functions, and custom directives
     const fullCtx = computed<PropResolutionContext>(() => {
       const base: PropResolutionContext = repeatScope
         ? {
@@ -251,6 +285,7 @@ const ElementRenderer = defineComponent({
           }
         : { ...visibilityCtx.value };
       base.functions = functions.value;
+      base.directives = directives.value;
       return base;
     });
 
@@ -591,6 +626,8 @@ export interface JSONUIProviderProps {
   >;
   /** Named functions for `$computed` expressions in props */
   functions?: Record<string, ComputedFunction>;
+  /** Custom directives for user-defined `$`-prefixed dynamic values */
+  directives?: DirectiveDefinition[];
   onStateChange?: (changes: Array<{ path: string; value: unknown }>) => void;
 }
 
@@ -638,6 +675,10 @@ export const JSONUIProvider = defineComponent({
       type: Object as PropType<Record<string, ComputedFunction>>,
       default: undefined,
     },
+    directives: {
+      type: Array as PropType<DirectiveDefinition[]>,
+      default: undefined,
+    },
     onStateChange: {
       type: Function as PropType<
         (changes: Array<{ path: string; value: unknown }>) => void
@@ -672,10 +713,17 @@ export const JSONUIProvider = defineComponent({
                               FunctionsProvider,
                               { functions: props.functions },
                               {
-                                default: () => [
-                                  slots.default?.(),
-                                  h(ConfirmationDialogManager),
-                                ],
+                                default: () =>
+                                  h(
+                                    DirectivesProvider,
+                                    { directives: props.directives },
+                                    {
+                                      default: () => [
+                                        slots.default?.(),
+                                        h(ConfirmationDialogManager),
+                                      ],
+                                    },
+                                  ),
                               },
                             ),
                         },
@@ -854,6 +902,8 @@ export interface CreateRendererProps {
   onStateChange?: (changes: Array<{ path: string; value: unknown }>) => void;
   /** Named functions for `$computed` expressions in props */
   functions?: Record<string, ComputedFunction>;
+  /** Custom directives for user-defined `$`-prefixed dynamic values */
+  directives?: DirectiveDefinition[];
   loading?: boolean;
   fallback?: Component;
 }
@@ -922,6 +972,10 @@ export function createRenderer<
         type: Object as PropType<Record<string, ComputedFunction>>,
         default: undefined,
       },
+      directives: {
+        type: Array as PropType<DirectiveDefinition[]>,
+        default: undefined,
+      },
       loading: {
         type: Boolean,
         default: undefined,
@@ -972,15 +1026,22 @@ export function createRenderer<
                               FunctionsProvider,
                               { functions: rendererProps.functions },
                               {
-                                default: () => [
-                                  h(Renderer, {
-                                    spec: rendererProps.spec,
-                                    registry,
-                                    loading: rendererProps.loading,
-                                    fallback: rendererProps.fallback,
-                                  }),
-                                  h(ConfirmationDialogManager),
-                                ],
+                                default: () =>
+                                  h(
+                                    DirectivesProvider,
+                                    { directives: rendererProps.directives },
+                                    {
+                                      default: () => [
+                                        h(Renderer, {
+                                          spec: rendererProps.spec,
+                                          registry,
+                                          loading: rendererProps.loading,
+                                          fallback: rendererProps.fallback,
+                                        }),
+                                        h(ConfirmationDialogManager),
+                                      ],
+                                    },
+                                  ),
                               },
                             ),
                         },

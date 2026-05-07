@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { EditMode } from "./edit-modes";
 import { buildEditInstructions } from "./edit-modes";
+import type { DirectiveDefinition } from "./directives";
 
 /**
  * Schema builder primitives
@@ -146,6 +147,12 @@ export interface PromptOptions {
   mode?: "standalone" | "inline" | "generate" | "chat";
   /** Edit modes to document in the system prompt. Default: `["patch"]`. */
   editModes?: EditMode[];
+  /**
+   * Custom directives to include in the system prompt.
+   * Each directive's schema is auto-described; the optional `description`
+   * field adds behavioral context. Pass the same array used at runtime.
+   */
+  directives?: DirectiveDefinition[];
 }
 
 /**
@@ -965,6 +972,22 @@ Note: state patches appear right after the elements that use them, so the UI fil
     )) {
       lines.push(`   - ${name}`);
     }
+    lines.push("");
+  }
+
+  // Custom directives section — auto-describe schema + optional description
+  const directives = options.directives;
+  if (directives && directives.length > 0) {
+    lines.push("CUSTOM DYNAMIC VALUES:");
+    lines.push("");
+    for (const d of directives) {
+      const desc = d.description ? ` (${d.description})` : "";
+      lines.push(`- ${d.name}${desc}: ${formatZodType(d.schema)}`);
+    }
+    lines.push("");
+    lines.push(
+      "Directives compose: any value field can contain another directive or a $state expression, resolved inside-out.",
+    );
     lines.push("");
   }
 

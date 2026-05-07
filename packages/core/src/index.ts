@@ -85,6 +85,15 @@ export {
   resolveActionParam,
 } from "./props";
 
+// Custom Directives
+export type { DirectiveDefinition, DirectiveRegistry } from "./directives";
+
+export {
+  defineDirective,
+  createDirectiveRegistry,
+  findDirective,
+} from "./directives";
+
 // Actions
 export type {
   ActionBinding,

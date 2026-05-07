@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { ComputedFunction, Spec, StateStore } from "@json-render/core";
+  import type { ComputedFunction, DirectiveDefinition, Spec, StateStore } from "@json-render/core";
   import type { ComponentRenderer, ComponentRegistry } from "./renderer.js";
 
   export interface CatalogRendererProps {
@@ -10,6 +10,8 @@
     onAction?: (actionName: string, params?: Record<string, unknown>) => void;
     onStateChange?: (changes: Array<{ path: string; value: unknown }>) => void;
     functions?: Record<string, ComputedFunction>;
+    /** Custom directives for user-defined `$`-prefixed dynamic values */
+    directives?: DirectiveDefinition[];
     loading?: boolean;
     fallback?: ComponentRenderer;
   }
@@ -28,6 +30,7 @@
     onAction,
     onStateChange,
     functions,
+    directives,
     loading = false,
     fallback,
   }: CatalogRendererProps = $props();
@@ -50,6 +53,7 @@
   initialState={state}
   handlers={actionHandlers}
   {functions}
+  {directives}
   {onStateChange}>
   <Renderer {spec} {registry} {loading} {fallback} />
 </JsonUIProvider>

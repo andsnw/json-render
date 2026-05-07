@@ -32,6 +32,7 @@ export const docsNavigation: NavSection[] = [
       { title: "Visibility", href: "/docs/visibility" },
       { title: "Watchers", href: "/docs/watchers" },
       { title: "Validation", href: "/docs/validation" },
+      { title: "Directives", href: "/docs/directives" },
     ],
   },
   {
@@ -86,6 +87,7 @@ export const docsNavigation: NavSection[] = [
         title: "@json-render/react-three-fiber",
         href: "/docs/api/react-three-fiber",
       },
+      { title: "@json-render/directives", href: "/docs/api/directives" },
       { title: "@json-render/codegen", href: "/docs/api/codegen" },
       { title: "@json-render/devtools", href: "/docs/api/devtools" },
       {

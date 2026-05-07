@@ -16,6 +16,7 @@
   import { getActionContext } from "./contexts/ActionProvider.svelte";
   import { getRepeatScope } from "./contexts/RepeatScopeProvider.svelte";
   import { getFunctions } from "./contexts/FunctionsContextProvider.svelte";
+  import { getDirectives } from "./contexts/DirectivesContextProvider.svelte";
   import RepeatChildren from "./RepeatChildren.svelte";
   import Self from "./ElementRenderer.svelte";
 
@@ -49,8 +50,9 @@
   const actionCtx = getActionContext();
   const repeatScope = getRepeatScope();
   const functions = getFunctions();
+  const directives = getDirectives();
 
-  // Build context with repeat scope and $computed functions
+  // Build context with repeat scope, $computed functions, and custom directives
   let fullCtx = $derived<PropResolutionContext>(
     repeatScope
       ? {
@@ -59,8 +61,9 @@
           repeatIndex: repeatScope.index,
           repeatBasePath: repeatScope.basePath,
           functions,
+          directives,
         }
-      : { stateModel: stateCtx.state, functions },
+      : { stateModel: stateCtx.state, functions, directives },
   );
 
   // Evaluate visibility

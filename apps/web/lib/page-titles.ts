@@ -40,6 +40,7 @@ export const PAGE_TITLES: Record<string, string> = {
   "docs/migration": "Migration Guide",
   "docs/changelog": "Changelog",
   "docs/skills": "Skills",
+  "docs/directives": "Directives",
 
   // API references
   "docs/api/core": "@json-render/core API",
@@ -51,6 +52,7 @@ export const PAGE_TITLES: Record<string, string> = {
   "docs/api/react-email": "@json-render/react-email API",
   "docs/api/react-native": "@json-render/react-native API",
   "docs/api/svelte": "@json-render/svelte API",
+  "docs/api/directives": "@json-render/directives API",
   "docs/api/codegen": "@json-render/codegen API",
   "docs/api/devtools": "@json-render/devtools API",
   "docs/api/devtools-react": "@json-render/devtools-react API",

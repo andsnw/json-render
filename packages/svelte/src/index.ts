@@ -46,6 +46,12 @@ export {
   type FunctionsContext,
 } from "./contexts/FunctionsContextProvider.svelte";
 
+export {
+  default as DirectivesContextProvider,
+  getDirectives,
+  type DirectivesContext,
+} from "./contexts/DirectivesContextProvider.svelte";
+
 // =============================================================================
 // Schema
 // =============================================================================
